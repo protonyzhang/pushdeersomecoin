@@ -22,10 +22,8 @@ jobs:
           PRICE="${{ steps.fetch.outputs.price }}"
           TIME=$(TZ="Asia/Shanghai" date '+%Y-%m-%d %H:%M:%S')
           
-          TITLE="💰 Bitway 价格"
-          CONTENT="## 当前价格
-          **${PRICE} USD**
-          
+          TITLE=" Bitway 价格 ${PRICE} USD"
+          CONTENT="
           _更新时间：${TIME}_
           _数据来源：CoinGecko_"
           
