@@ -2,7 +2,7 @@ name: Bitway Price Monitor
 
 on:
   schedule:
-    - cron: '0 0-15 * * *'  
+    - cron: '0 8-23 * * *'  
   workflow_dispatch:        # 支持手动触发
 
 jobs:
