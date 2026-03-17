@@ -1,0 +1,38 @@
+name: Bitway Price Monitor
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # 每 10 分钟
+  workflow_dispatch:        # 支持手动触发
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Price
+        id: fetch
+        run: |
+          RESPONSE=$(curl -s "https://api.coingecko.com/api/v3/simple/price?ids=bitway&vs_currencies=usd")
+          PRICE=$(echo "$RESPONSE" | jq -r '.bitway.usd')
+          echo "price=${PRICE}" >> $GITHUB_OUTPUT
+          echo "response=${RESPONSE}" >> $GITHUB_OUTPUT
+
+      - name: Send to PushDeer
+        run: |
+          PRICE="${{ steps.fetch.outputs.price }}"
+          TIME=$(TZ="Asia/Shanghai" date '+%Y-%m-%d %H:%M:%S')
+          
+          TITLE="💰 Bitway 价格"
+          CONTENT="## 当前价格
+          **${PRICE} USD**
+          
+          _更新时间：${TIME}_
+          _数据来源：CoinGecko_"
+          
+          curl -s -X POST "https://api2.pushdeer.com/message/push" \
+            -d "pushkey=${{ secrets.PUSHDEER_KEY }}" \
+            -d "text=${TITLE}" \
+            -d "desp=${CONTENT}" \
+            -d "type=markdown"
+          
+          echo "✅ 推送成功"
